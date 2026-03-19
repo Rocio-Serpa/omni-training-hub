@@ -865,6 +865,9 @@ body.light .topbar-logo svg path { fill: var(--accent); }
 
 // ★ REPLACE WITH YOUR SHEET ID to pull live data
 // Format: https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=SECTIONS
+// Published CSV base URL (from File → Share → Publish to web)
+const PUBLISHED_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYozLQPTiM1NYI2N4XxSQ3pyWHg16xH61rMBEfTArWAOZppTN31OMso7N2v4eZ_HVoyF-Jgllu4wxE/pub?output=csv";
+
 let SHEET_ID = "19ApRDCTxT-McevNXRoHdHXME-tGw_R5Z-uhf0xX8pmA";
 
 // ★ REPLACE WITH YOUR APPS SCRIPT WEB APP URL for completion logging
@@ -1195,14 +1198,21 @@ function setLoading(on, msg = '') {
 
 // ════════════════════════════════════════════════════════
 //  GOOGLE SHEETS LOADER
-//  Reads two published CSV tabs: SECTIONS and QUESTIONS
+//  Uses the published /e/ URL — works without sign-in
 // ════════════════════════════════════════════════════════
 async function loadFromSheet(sheetId) {
-  const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=`;
+  // Use the published base URL with sheet name parameter
+  const base = PUBLISHED_BASE + '&sheet=';
 
   const [secText, qText] = await Promise.all([
-    fetch(base + 'SECTIONS').then(r => r.text()),
-    fetch(base + 'QUESTIONS').then(r => r.text()),
+    fetch(base + 'SECTIONS').then(r => {
+      if (!r.ok) throw new Error('SECTIONS fetch failed');
+      return r.text();
+    }),
+    fetch(base + 'QUESTIONS').then(r => {
+      if (!r.ok) throw new Error('QUESTIONS fetch failed');
+      return r.text();
+    }),
   ]);
 
   state.sections  = parseCSV(secText,  ['section_id','order','type','section_title','subtitle','body_html']);
