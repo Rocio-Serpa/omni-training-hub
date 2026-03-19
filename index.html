@@ -183,15 +183,13 @@ body.light .topbar-logo svg path { fill: var(--accent); }
   border: 1px solid var(--border);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   transition: all .2s;
-  box-shadow: 0 2px 12px rgba(0,0,0,.3);
-  color: #B8F04A;   /* always lime — visible on both dark and light */
+  box-shadow: 0 2px 12px rgba(0,0,0,.15);
 }
 .theme-toggle:hover {
-  border-color: #B8F04A;
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px rgba(184,240,74,.2);
+  border-color: var(--accent);
+  transform: scale(1.08);
 }
 
 
@@ -509,8 +507,7 @@ body.light .topbar-logo svg path { fill: var(--accent); }
 /* ─── MAIN CONTENT ─────────────────────────────────────── */
 .main {
   padding: 48px 56px;
-  width: 100%;
-  min-width: 0;
+  max-width: 760px;
 }
 
 /* Section header */
@@ -865,13 +862,10 @@ body.light .topbar-logo svg path { fill: var(--accent); }
 
 // ★ REPLACE WITH YOUR SHEET ID to pull live data
 // Format: https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=SECTIONS
-// Published CSV base URL (from File → Share → Publish to web)
-const PUBLISHED_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSYozLQPTiM1NYI2N4XxSQ3pyWHg16xH61rMBEfTArWAOZppTN31OMso7N2v4eZ_HVoyF-Jgllu4wxE/pub?output=csv";
-
-let SHEET_ID = "19ApRDCTxT-McevNXRoHdHXME-tGw_R5Z-uhf0xX8pmA";
+let SHEET_ID = "";   // e.g. "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
 
 // ★ REPLACE WITH YOUR APPS SCRIPT WEB APP URL for completion logging
-let APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysG5SrYGX_EipqjauQuhWeIavxCGueHh8sUmk1qmX6685zNrYfe8LUlSbk0DA5BKRv_w/exec";   // e.g. "https://script.google.com/macros/s/AKfyc.../exec"
+let APPS_SCRIPT_URL = "";   // e.g. "https://script.google.com/macros/s/AKfyc.../exec"
 
 // ════════════════════════════════════════════════════════
 //  BUILT-IN DEMO DATA (used when no Sheet ID configured)
@@ -1198,21 +1192,14 @@ function setLoading(on, msg = '') {
 
 // ════════════════════════════════════════════════════════
 //  GOOGLE SHEETS LOADER
-//  Uses the published /e/ URL — works without sign-in
+//  Reads two published CSV tabs: SECTIONS and QUESTIONS
 // ════════════════════════════════════════════════════════
 async function loadFromSheet(sheetId) {
-  // Use the published base URL with sheet name parameter
-  const base = PUBLISHED_BASE + '&sheet=';
+  const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=`;
 
   const [secText, qText] = await Promise.all([
-    fetch(base + 'SECTIONS').then(r => {
-      if (!r.ok) throw new Error('SECTIONS fetch failed');
-      return r.text();
-    }),
-    fetch(base + 'QUESTIONS').then(r => {
-      if (!r.ok) throw new Error('QUESTIONS fetch failed');
-      return r.text();
-    }),
+    fetch(base + 'SECTIONS').then(r => r.text()),
+    fetch(base + 'QUESTIONS').then(r => r.text()),
   ]);
 
   state.sections  = parseCSV(secText,  ['section_id','order','type','section_title','subtitle','body_html']);
