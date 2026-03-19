@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expert Training — Invisible Technologies</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800;1,900&family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+/* ─── INVISIBLE BRAND TOKENS ─────────────────────────── */
+:root {
+  /* Dark mode (default) */
+  --bg:       #0D0D0D;
+  --fg:       #F5F5F0;
+  --black:    #0D0D0D;
+  --white:    #F5F5F0;
+  --gray-100: #EBEBEB;
+  --gray-200: #D4D4D4;
+  --gray-400: #8A8A8A;
+  --gray-600: #4A4A4A;
+  --surface:  #161616;
+  --surface2: #1E1E1E;
+  --border:   #2A2A2A;
+
+  /* Dark mode accent palette — lime + pink */
+  --accent:   #B8F04A;   /* signature lime-green */
+  --accent2:  #FF6EB4;   /* hot pink / magenta */
+  --green:    #B8F04A;   /* alias kept for compat */
+  --red:      #FF4545;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-ui:      'Outfit', sans-serif;
+  --font-body:    'IBM Plex Sans', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Subtle grid texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── LIGHT MODE ─────────────────────────────────────── */
+body.light {
+  /* Light mode surfaces — warm white / cream */
+  --black:    #F4F1EC;
+  --white:    #1A1208;
+  --gray-100: #E6E0D6;
+  --gray-200: #C8BFB0;
+  --gray-400: #6B6358;
+  --gray-600: #9A9288;
+  --surface:  #FDFAF5;
+  --surface2: #EDE8DF;
+  --border:   #D6CFC4;
+
+  /* Light mode accent palette — cobalt blue + bordo/burgundy */
+  --accent:   #1B4FD8;   /* cobalt blue */
+  --accent2:  #8B1A2F;   /* bordo / deep burgundy */
+  --green:    #1B4FD8;   /* alias remapped to blue */
+  --red:      #8B1A2F;
+}
+
+body.light::before {
+  background-image:
+    linear-gradient(rgba(0,0,0,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,.035) 1px, transparent 1px);
+}
+
+body.light .topbar {
+  background: rgba(244,241,236,.92);
+}
+
+body.light #loading-screen { background: #F4F1EC; }
+body.light .loading-logo    { color: #6B6358; }
+body.light .loading-bar     { background: var(--accent); }
+
+body.light .field input     { background: #FFFFFF; }
+body.light .block           { background: #FFFFFF; }
+body.light .rule-card       { background: #EDE8DF; }
+body.light .q-card          { background: #FFFFFF; }
+body.light .option          { background: #F4F1EC; }
+body.light .option:hover:not(.disabled) { background: #EDE8DF; }
+body.light .quiz-header     { background: #FFFFFF; }
+body.light .admin-panel     { background: #FFFFFF; }
+body.light .admin-field input { background: #F4F1EC; }
+
+/* Light mode callout uses blue tint */
+body.light .callout {
+  background: rgba(27,79,216,.05);
+  border-left-color: var(--accent);
+}
+/* Light mode nav active */
+body.light .nav-item.active {
+  background: rgba(27,79,216,.08);
+}
+body.light .nav-item.active::before { background: var(--accent); }
+/* Light mode option selected/correct */
+body.light .option.correct {
+  border-color: var(--accent);
+  background: rgba(27,79,216,.07);
+}
+body.light .option.correct .opt-letter {
+  background: rgba(27,79,216,.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+body.light .option.correct .opt-explain { color: rgba(27,79,216,.85); }
+body.light .option.correct .opt-verdict { color: var(--accent); }
+body.light .q-feedback.pass {
+  background: rgba(27,79,216,.06);
+  border-color: rgba(27,79,216,.25);
+  color: #1B4FD8;
+}
+/* Light mode wrong = bordo */
+body.light .option.wrong {
+  border-color: var(--accent2);
+  background: rgba(139,26,47,.06);
+}
+body.light .option.wrong .opt-letter {
+  background: rgba(139,26,47,.12);
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
+body.light .option.wrong .opt-explain { color: rgba(139,26,47,.85); }
+body.light .option.wrong .opt-verdict { color: var(--accent2); }
+body.light .q-feedback.fail {
+  background: rgba(139,26,47,.05);
+  border-color: rgba(139,26,47,.2);
+  color: var(--accent2);
+}
+/* Light mode score */
+body.light .score-number.great { color: var(--accent); }
+body.light .score-number.low   { color: var(--accent2); }
+body.light .stat-cell          { background: #FFFFFF; }
+/* Light mode admin status */
+body.light .admin-status.ok  { background: rgba(27,79,216,.08); color: var(--accent); }
+body.light .admin-status.err { background: rgba(139,26,47,.07); color: var(--accent2); }
+
+/* Light mode progress bar */
+body.light .progress-fill { background: var(--accent); }
+
+/* Light mode btn-primary */
+body.light .btn-primary { background: var(--accent); color: #FFFFFF; }
+body.light .btn-primary:hover { background: #2a63f0; }
+
+/* Light mode eyebrow lines */
+body.light .eyebrow        { color: var(--accent); }
+body.light .eyebrow::before { background: var(--accent); }
+body.light .login-eyebrow  { color: var(--accent); }
+body.light .login-eyebrow::before { background: var(--accent); }
+body.light .rule-num       { color: var(--accent); }
+body.light .block h4       { color: var(--accent); }
+body.light .callout strong { color: var(--accent); }
+body.light .admin-eyebrow  { color: var(--accent); }
+body.light .admin-eyebrow::before { background: var(--accent); }
+body.light .admin-save     { background: var(--accent); color: #FFFFFF; }
+body.light .admin-save:hover { background: #2a63f0; }
+body.light .status-dot     { background: var(--accent2); }
+body.light .topbar-logo svg path { fill: var(--accent); }
+
+/* ─── THEME TOGGLE ───────────────────────────────────── */
+.theme-toggle {
+  position: fixed; bottom: 20px; right: 20px;
+  z-index: 200;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all .2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,.15);
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: scale(1.08);
+}
+
+
+#loading-screen {
+  position: fixed; inset: 0;
+  background: var(--black);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 1000;
+  transition: opacity .4s ease, visibility .4s;
+}
+#loading-screen.hidden { opacity: 0; visibility: hidden; }
+
+.loading-logo {
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--gray-400);
+  margin-bottom: 32px;
+}
+
+.loading-bar-wrap {
+  width: 200px; height: 1px; background: var(--border);
+  position: relative; overflow: hidden;
+}
+.loading-bar {
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%; background: var(--accent);
+  animation: slide-bar 1.4s ease-in-out infinite;
+}
+@keyframes slide-bar {
+  0% { left: -60%; }
+  100% { left: 110%; }
+}
+.loading-status {
+  font-family: var(--font-mono); font-size: 11px; color: var(--gray-400);
+  margin-top: 16px; letter-spacing: .05em;
+}
+
+/* ─── APP SHELL ───────────────────────────────────────── */
+#app { position: relative; z-index: 1; display: none; }
+#app.ready { display: block; }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ─── TOPBAR ──────────────────────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: rgba(13,13,13,.92);
+  backdrop-filter: blur(16px);
+  display: flex; align-items: center;
+  padding: 0 32px; height: 56px;
+  gap: 24px;
+}
+
+.topbar-logo {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--white);
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+
+.topbar-logo .sep {
+  width: 1px; height: 16px; background: var(--border);
+}
+
+.topbar-logo .project {
+  font-weight: 400; color: var(--gray-400); font-size: 12px;
+  letter-spacing: .08em;
+}
+
+.topbar-progress {
+  flex: 1; display: flex; align-items: center; gap: 12px;
+  max-width: 360px;
+}
+
+.progress-track {
+  flex: 1; height: 2px; background: var(--border); border-radius: 1px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--accent); border-radius: 1px;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+.progress-txt {
+  font-family: var(--font-mono); font-size: 10px; color: var(--gray-400);
+  white-space: nowrap; letter-spacing: .04em;
+}
+
+.topbar-user {
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 11px; color: var(--gray-400);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  animation: blink 2.5s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ─── LOGIN ───────────────────────────────────────────── */
+#screen-login {
+  min-height: 100vh; display: flex;
+  align-items: center; justify-content: center;
+  padding: 40px 20px;
+}
+
+.login-wrap {
+  width: 100%; max-width: 480px;
+}
+
+.login-eyebrow {
+  font-family: var(--font-mono); font-size: 11px;
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--accent); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.login-eyebrow::before {
+  content: ''; display: block; width: 24px; height: 1px; background: var(--accent);
+}
+
+.login-title {
+  font-family: var(--font-display); font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800; line-height: 1.0;
+  margin-bottom: 12px;
+}
+.login-title em { font-style: italic; color: var(--accent); }
+
+.login-sub {
+  color: var(--gray-400); font-size: 15px; line-height: 1.7;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--gray-400);
+  margin-bottom: 8px;
+}
+.field input {
+  width: 100%; padding: 13px 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 2px; color: var(--white);
+  font-family: var(--font-body); font-size: 15px;
+  outline: none; transition: border-color .2s;
+}
+.field input:focus { border-color: var(--accent); }
+.field input::placeholder { color: var(--gray-600); }
+
+.btn-primary {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 15px 20px;
+  background: var(--accent); color: var(--black);
+  border: none; border-radius: 2px; cursor: pointer;
+  font-family: var(--font-ui); font-size: 15px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  transition: all .2s;
+}
+.btn-primary:hover { background: #d4ff70; transform: translateY(-1px); }
+.btn-primary .arrow { font-size: 18px; transition: transform .2s; }
+.btn-primary:hover .arrow { transform: translateX(4px); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 20px;
+  background: transparent; color: var(--gray-400);
+  border: 1px solid var(--border); border-radius: 2px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .08em; transition: all .2s;
+}
+.btn-ghost:hover { border-color: var(--gray-200); color: var(--white); }
+
+.login-note {
+  font-family: var(--font-mono); font-size: 10px; color: var(--gray-600);
+  margin-top: 14px; letter-spacing: .04em;
+}
+
+/* ─── ADMIN MODAL ─────────────────────────────────────── */
+#admin-modal {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+}
+#admin-modal.open { display: flex; }
+
+.admin-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 32px; width: 100%; max-width: 420px;
+  position: relative;
+}
+.admin-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--accent); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.admin-eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--accent); }
+
+.admin-panel h3 {
+  font-family: var(--font-ui); font-size: 18px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.admin-panel > p {
+  font-size: 13px; color: var(--gray-400); margin-bottom: 24px;
+  font-weight: 300; line-height: 1.6;
+}
+.admin-field { margin-bottom: 16px; }
+.admin-field label {
+  display: block; font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--gray-400);
+  margin-bottom: 6px;
+}
+.admin-field input {
+  width: 100%; padding: 11px 13px;
+  background: var(--black); border: 1px solid var(--border);
+  border-radius: 2px; color: var(--white);
+  font-family: var(--font-mono); font-size: 12px; outline: none;
+  transition: border-color .2s;
+}
+.admin-field input:focus { border-color: var(--accent); }
+.admin-note {
+  font-family: var(--font-mono); font-size: 10px; color: var(--gray-600);
+  margin-top: 6px; line-height: 1.6;
+}
+.admin-actions {
+  display: flex; gap: 10px; margin-top: 20px;
+}
+.admin-save {
+  flex: 1; padding: 11px 16px;
+  background: var(--accent); color: var(--black);
+  border: none; border-radius: 2px; cursor: pointer;
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  transition: all .2s;
+}
+.admin-save:hover { background: #d4ff70; }
+.admin-cancel {
+  padding: 11px 16px;
+  background: transparent; color: var(--gray-400);
+  border: 1px solid var(--border); border-radius: 2px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12px;
+  transition: all .2s;
+}
+.admin-cancel:hover { border-color: var(--gray-400); color: var(--white); }
+.admin-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; color: var(--gray-400);
+  font-size: 18px; cursor: pointer; line-height: 1;
+  transition: color .15s;
+}
+.admin-close:hover { color: var(--white); }
+.admin-status {
+  font-family: var(--font-mono); font-size: 11px;
+  margin-top: 12px; padding: 8px 12px; border-radius: 2px;
+  display: none;
+}
+.admin-status.ok  { display: block; background: rgba(184,240,74,.1); color: var(--accent); }
+.admin-status.err { display: block; background: rgba(255,69,69,.08); color: #ff9999; }
+
+/* ─── CONTENT LAYOUT ──────────────────────────────────── */
+#screen-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  flex: 1;
+}
+
+/* ─── SIDEBAR ──────────────────────────────────────────── */
+.sidebar {
+  border-right: 1px solid var(--border);
+  padding: 28px 0;
+  position: sticky; top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.sidebar::-webkit-scrollbar { width: 2px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+.sidebar-group { padding: 0 16px; margin-bottom: 8px; }
+.sidebar-label {
+  font-family: var(--font-mono); font-size: 9px; text-transform: uppercase;
+  letter-spacing: .16em; color: var(--gray-600); padding: 8px 8px 4px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 2px; cursor: pointer;
+  font-size: 12px; color: var(--gray-400);
+  transition: all .15s; margin-bottom: 1px;
+  position: relative;
+}
+.nav-item:hover { background: var(--surface2); color: var(--white); }
+.nav-item.active {
+  background: rgba(184,240,74,.08);
+  color: var(--accent);
+}
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--accent); border-radius: 0 1px 1px 0;
+}
+.nav-item .nav-icon { font-size: 11px; width: 16px; flex-shrink: 0; text-align: center; }
+.nav-item .nav-label { flex: 1; line-height: 1.3; }
+.nav-item .nav-check { font-size: 11px; color: var(--accent); margin-left: auto; }
+.nav-item.quiz-item { font-style: italic; }
+
+/* ─── MAIN CONTENT ─────────────────────────────────────── */
+.main {
+  padding: 48px 56px;
+  max-width: 760px;
+}
+
+/* Section header */
+.eyebrow {
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--accent);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--accent); }
+
+.section-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 800; line-height: 1.05;
+  margin-bottom: 8px;
+  letter-spacing: -.01em;
+}
+
+.section-lead {
+  color: var(--gray-400); font-size: 15px; font-weight: 300;
+  line-height: 1.7; margin-bottom: 36px;
+  max-width: 560px;
+}
+
+/* Reading blocks */
+.block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+.block h3 {
+  font-family: var(--font-ui); font-size: 18px; font-weight: 700;
+  margin-bottom: 14px; line-height: 1.2;
+}
+.block h4 {
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--accent); margin-top: 20px; margin-bottom: 8px;
+}
+.block p { color: var(--gray-400); font-size: 14px; margin-bottom: 10px; font-weight: 300; }
+.block p:last-child { margin-bottom: 0; }
+.block ul { padding-left: 18px; margin-bottom: 10px; }
+.block li { color: var(--gray-400); font-size: 14px; margin-bottom: 5px; font-weight: 300; }
+.block strong { color: var(--white); font-weight: 500; }
+
+.callout {
+  border-left: 2px solid var(--accent);
+  padding: 12px 16px;
+  background: rgba(184,240,74,.05);
+  border-radius: 0 2px 2px 0;
+  margin: 14px 0; font-size: 14px; color: var(--gray-400);
+}
+.callout strong { color: var(--accent); }
+
+.rule-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;
+}
+.rule-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 14px;
+}
+.rule-num {
+  font-family: var(--font-mono); font-size: 9px; color: var(--accent);
+  letter-spacing: .1em; margin-bottom: 4px; text-transform: uppercase;
+}
+.rule-card strong { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.rule-card p { font-size: 12px; color: var(--gray-400); margin: 0; }
+
+/* ─── QUIZ ──────────────────────────────────────────────── */
+.quiz-header {
+  display: flex; align-items: flex-start; gap: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 2px; padding: 20px 24px; margin-bottom: 28px;
+}
+.quiz-icon { font-size: 24px; padding-top: 2px; }
+.quiz-header h3 {
+  font-family: var(--font-ui); font-size: 15px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px;
+}
+.quiz-header p { font-size: 13px; color: var(--gray-400); font-weight: 300; }
+
+.q-card {
+  border: 1px solid var(--border); border-radius: 2px;
+  padding: 24px 28px; margin-bottom: 16px;
+  background: var(--surface);
+}
+.q-meta {
+  font-family: var(--font-mono); font-size: 10px; color: var(--gray-600);
+  letter-spacing: .08em; margin-bottom: 12px; text-transform: uppercase;
+}
+.q-text { font-size: 16px; font-weight: 500; line-height: 1.55; margin-bottom: 20px; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+
+.option {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px; border: 1px solid var(--border);
+  border-radius: 2px; cursor: pointer; background: var(--black);
+  transition: all .18s;
+}
+.option:hover:not(.disabled) { border-color: var(--gray-200); background: var(--surface2); }
+.option.selected { border-color: var(--accent); background: rgba(184,240,74,.05); }
+.option.correct { border-color: var(--accent); background: rgba(184,240,74,.08); }
+.option.wrong { border-color: var(--accent2); background: rgba(255,110,180,.07); }
+.option.disabled { cursor: default; }
+
+.opt-letter {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--gray-400);
+  margin-top: 1px;
+}
+.option.correct .opt-letter { background: rgba(184,240,74,.2); border-color: var(--accent); color: var(--accent); }
+.option.wrong   .opt-letter { background: rgba(255,110,180,.15); border-color: var(--accent2); color: var(--accent2); }
+
+.opt-body { flex: 1; }
+.opt-text { font-size: 13px; font-weight: 400; line-height: 1.45; }
+.opt-verdict {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em; margin-top: 6px;
+  display: none;
+}
+.option.correct .opt-verdict { display: block; color: var(--accent); }
+.option.wrong   .opt-verdict { display: block; color: var(--accent2); }
+.opt-explain { font-size: 12px; color: var(--gray-400); margin-top: 4px; line-height: 1.5; display: none; font-weight: 300; }
+.option.correct .opt-explain,
+.option.wrong   .opt-explain { display: block; }
+.option.correct .opt-explain { color: rgba(184,240,74,.8); }
+.option.wrong   .opt-explain { color: rgba(255,110,180,.9); }
+
+.q-feedback {
+  margin-top: 12px; padding: 12px 16px;
+  border-radius: 2px; font-size: 13px; font-weight: 300; line-height: 1.55;
+  display: none;
+}
+.q-feedback.show { display: block; }
+.q-feedback.pass { background: rgba(184,240,74,.07); border: 1px solid rgba(184,240,74,.25); color: rgba(184,240,74,.9); }
+.q-feedback.fail { background: rgba(255,110,180,.07); border: 1px solid rgba(255,110,180,.25); color: rgba(255,110,180,.95); }
+
+/* ─── SECTION NAV ──────────────────────────────────────── */
+.section-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 40px; padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── SCORE ─────────────────────────────────────────────── */
+#screen-score {
+  min-height: 100vh; display: flex;
+  align-items: center; justify-content: center;
+  padding: 40px 20px;
+}
+
+.score-wrap { width: 100%; max-width: 520px; }
+
+.score-number {
+  font-family: var(--font-display); font-size: clamp(80px, 14vw, 120px);
+  font-weight: 800; line-height: 1; letter-spacing: -.03em;
+  margin-bottom: 4px;
+}
+.score-number.great { color: var(--accent); }
+.score-number.ok    { color: #FFD060; }
+.score-number.low   { color: var(--red); }
+
+.score-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: .12em; color: var(--gray-400);
+  border: 1px solid var(--border); border-radius: 2px;
+  padding: 6px 12px; margin-bottom: 24px;
+}
+
+.score-title {
+  font-family: var(--font-ui); font-size: 28px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.score-msg { color: var(--gray-400); font-size: 14px; font-weight: 300; line-height: 1.7; margin-bottom: 32px; }
+
+.score-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--border); border: 1px solid var(--border);
+  border-radius: 2px; overflow: hidden; margin-bottom: 28px;
+}
+.stat-cell {
+  background: var(--surface); padding: 18px 20px;
+}
+.stat-val { font-family: var(--font-ui); font-size: 28px; font-weight: 800; }
+.stat-lbl { font-family: var(--font-mono); font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .1em; margin-top: 2px; }
+
+/* ─── ERROR STATE ──────────────────────────────────────── */
+.error-banner {
+  background: rgba(255,69,69,.08); border: 1px solid rgba(255,69,69,.3);
+  border-radius: 2px; padding: 16px 20px; margin-bottom: 20px;
+  font-family: var(--font-mono); font-size: 12px; color: rgba(255,150,150,.9);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main { padding: 28px 20px; }
+  .rule-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+  .score-wrap { padding: 0 4px; }
+}
+
+/* ─── ANIMATIONS ───────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp .4s ease forwards; }
+
+/* stagger children */
+.fade-up > * { animation: fadeUp .4s ease both; }
+.fade-up > *:nth-child(1) { animation-delay: .05s; }
+.fade-up > *:nth-child(2) { animation-delay: .1s; }
+.fade-up > *:nth-child(3) { animation-delay: .15s; }
+.fade-up > *:nth-child(4) { animation-delay: .2s; }
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">☀</button>
+<div id="loading-screen">
+  <div class="loading-logo">Invisible Technologies</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-status" id="loading-status">Connecting to training data…</div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+
+  <!-- ── LOGIN ── -->
+  <div id="screen-login" class="screen active">
+    <div class="login-wrap fade-up">
+      <div class="login-eyebrow">Expert Training Portal</div>
+      <h1 class="login-title">Ready to<br>get <em>certified?</em></h1>
+      <p class="login-sub">
+        Complete the guided reading and knowledge checks before your official assessment.
+        Read, answer, read, answer — then take the real quiz.
+      </p>
+
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="input-name" placeholder="e.g. Maria Gonzalez" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="input-email" placeholder="your@invisible.email" />
+      </div>
+
+      <button class="btn-primary" onclick="startSession()">
+        Begin Training
+        <span class="arrow">→</span>
+      </button>
+      <p class="login-note">↳ Your name and completion status are recorded for your team lead.</p>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div id="screen-content" class="screen" style="display:none">
+    <div class="topbar">
+      <div class="topbar-logo">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.8776 1.10352L15.6523 5.26562L9.81706 15.3333H6.18294L0.347656 5.26562L4.1224 1.10352H11.8776ZM1.98958 5.43945L6.95117 14H9.04883L14.0104 5.4388L11.2871 2.43685H4.71289L1.98958 5.43945Z" fill="#B8F04A"/></svg>
+        Invisible
+        <div class="sep"></div>
+        <span class="project">Expert Training</span>
+      </div>
+      <div class="topbar-progress">
+        <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+        <span class="progress-txt" id="prog-label">0 / 0</span>
+      </div>
+      <div class="topbar-user">
+        <div class="status-dot"></div>
+        <span id="topbar-user-name"></span>
+      </div>
+    </div>
+    <div class="content-grid">
+      <nav class="sidebar" id="sidebar"><!-- injected --></nav>
+      <main class="main" id="main"><!-- injected --></main>
+    </div>
+  </div>
+
+  <!-- ── SCORE ── -->
+  <div id="screen-score" class="screen" style="display:none">
+    <div class="score-wrap fade-up">
+      <div class="score-number" id="score-num">--</div>
+      <div class="score-badge">✓ Training Complete</div>
+      <h2 class="score-title" id="score-title">–</h2>
+      <p class="score-msg" id="score-msg"></p>
+      <div class="score-stats">
+        <div class="stat-cell">
+          <div class="stat-val" id="stat-correct">–</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val" id="stat-pct">–</div>
+          <div class="stat-lbl">Score</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="restartApp()">
+        Retake Training <span class="arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ADMIN MODAL (DQA / Management only) ── -->
+  <!-- Access: press Ctrl+Shift+A anywhere, or add ?admin to the URL -->
+  <div id="admin-modal">
+    <div class="admin-panel">
+      <button class="admin-close" onclick="closeAdmin()">✕</button>
+      <div class="admin-eyebrow">Admin — DQA / Management</div>
+      <h3>Data Source Configuration</h3>
+      <p>Set the Google Sheet ID that powers this training app. Changes take effect on the next session start.</p>
+
+      <div class="admin-field">
+        <label>Google Sheet ID</label>
+        <input type="text" id="cfg-sheet-id"
+          placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" />
+        <p class="admin-note">
+          Found in the Sheet URL: .../spreadsheets/d/<strong>[ID]</strong>/edit<br>
+          Sheet must be published as CSV (File → Share → Publish to web).
+        </p>
+      </div>
+
+      <div class="admin-field">
+        <label>Apps Script URL (completion logging)</label>
+        <input type="text" id="cfg-script-url"
+          placeholder="https://script.google.com/macros/s/.../exec" />
+        <p class="admin-note">Optional. Logs expert completions to the COMPLETIONS tab.</p>
+      </div>
+
+      <div class="admin-actions">
+        <button class="admin-save" onclick="saveAdminConfig()">Save & Apply</button>
+        <button class="admin-cancel" onclick="closeAdmin()">Cancel</button>
+      </div>
+      <div class="admin-status" id="admin-status"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  CONFIGURATION
+// ════════════════════════════════════════════════════════
+
+// ★ REPLACE WITH YOUR SHEET ID to pull live data
+// Format: https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=SECTIONS
+let SHEET_ID = "19ApRDCTxT-McevNXRoHdHXME-tGw_R5Z-uhf0xX8pmA";   // e.g. "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+
+// ★ REPLACE WITH YOUR APPS SCRIPT WEB APP URL for completion logging
+let APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysG5SrYGX_EipqjauQuhWeIavxCGueHh8sUmk1qmX6685zNrYfe8LUlSbk0DA5BKRv_w/exec";   // e.g. "https://script.google.com/macros/s/AKfyc.../exec"
+
+// ════════════════════════════════════════════════════════
+//  BUILT-IN DEMO DATA (used when no Sheet ID configured)
+// ════════════════════════════════════════════════════════
+
+const DEMO_SECTIONS = [
+  { section_id:"S01", order:1, type:"reading", section_title:"Project Foundations & Purpose", subtitle:"Understand what we are building and why your work matters.",
+    body_html:`
+    <div class="block">
+      <h3>What is Omni Q&A?</h3>
+      <p>The Omni Q&A project exists to generate high-quality <strong>multimodal training data</strong> that strengthens next-generation AI models. Your role is to produce human-authored question &amp; answer (Q&A) pairs grounded in real video evidence — questions that expose genuine model weaknesses and target meaningful reasoning.</p>
+    </div>
+    <div class="block">
+      <h3>The 8 Core Principles</h3>
+      <div class="rule-grid">
+        <div class="rule-card"><div class="rule-num">01</div><strong>Grounded in the Video</strong><p>Every Q&A must be anchored in concrete audio-visual evidence.</p></div>
+        <div class="rule-card"><div class="rule-num">02</div><strong>Genuinely Multimodal</strong><p>Every question must require both audio and visual information.</p></div>
+        <div class="rule-card"><div class="rule-num">03</div><strong>Reasoning Over Observation</strong><p>Questions must demand genuine cognitive effort beyond simple observation.</p></div>
+        <div class="rule-card"><div class="rule-num">04</div><strong>Stumps the Model</strong><p>Questions must expose real weaknesses through natural prompts.</p></div>
+        <div class="rule-card"><div class="rule-num">05</div><strong>Human-Authored</strong><p>All questions and answers must be written by you. No AI assistance.</p></div>
+        <div class="rule-card"><div class="rule-num">06</div><strong>Precisely Tagged</strong><p>Ontology tags must accurately reflect the reasoning the question demands.</p></div>
+        <div class="rule-card"><div class="rule-num">07</div><strong>Diverse</strong><p>Each Q&A pair must introduce genuinely new reasoning and ontology coverage.</p></div>
+        <div class="rule-card"><div class="rule-num">08</div><strong>Safe &amp; Compliant</strong><p>Never include personal names, artist names, or character names.</p></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3>The Dual-Modality Test</h3>
+      <div class="callout"><strong>Mute Test:</strong> Can the question be answered by watching with no sound? If yes → fails multimodality.</div>
+      <div class="callout"><strong>Audio-Only Test:</strong> Can the question be answered by listening alone, without seeing the visuals? If yes → fails multimodality.</div>
+      <p>A valid question must fail <em>both</em> tests.</p>
+    </div>`
+  },
+  { section_id:"S02", order:2, type:"quiz", section_title:"Check-in #1", subtitle:"Two quick questions on what you just read." },
+  { section_id:"S03", order:3, type:"reading", section_title:"The Workflow", subtitle:"Nine steps to follow for every video, every time.",
+    body_html:`
+    <div class="block">
+      <h3>Nine Steps — Every Video, Every Time</h3>
+      <div class="rule-grid" style="grid-template-columns:1fr">
+        <div class="rule-card"><div class="rule-num">Step 1</div><strong>Watch the Video in Full</strong><p>Understand the full content before attempting any Q&A.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 2</div><strong>Identify Question Type Opportunities</strong><p>Scan for moments where both audio and visual reasoning are required.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 3</div><strong>Design the Question</strong><p>Write a grounded, multimodal question. Apply the Dual-Modality Test.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 4</div><strong>Stump Test Against the Model</strong><p>Submit your question. The model should fail to answer correctly.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 5</div><strong>Tag Ontology Types</strong><p>Select primary and secondary tags justified by the reasoning the question demands.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 6</div><strong>Set Timestamps</strong><p>Define start/end timestamps precise to the second.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 7</div><strong>Write the Answer</strong><p>Author a complete, accurate, evidence-based answer in your own words.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 8</div><strong>Repeat</strong><p>Each new pair must introduce genuinely new reasoning.</p></div>
+        <div class="rule-card"><div class="rule-num">Step 9</div><strong>Final Integrity Check</strong><p>Review the full set for diversity, coverage, and compliance.</p></div>
+      </div>
+      <div class="callout" style="margin-top:16px"><strong>Step 4 goal:</strong> Find questions where the model <em>fails</em>. If the model answers correctly, your question may be too easy.</div>
+    </div>`
+  },
+  { section_id:"S04", order:4, type:"quiz", section_title:"Check-in #2", subtitle:"Three questions on the workflow." },
+  { section_id:"S05", order:5, type:"reading", section_title:"Valid Questions & The Ontology", subtitle:"Classification rules, tagging requirements, and failure patterns.",
+    body_html:`
+    <div class="block">
+      <h3>Three Validity Bars</h3>
+      <ul>
+        <li><strong>Dual Modality:</strong> Requires both audio and visual information.</li>
+        <li><strong>Reasoning Depth:</strong> Demands genuine cognitive effort beyond simple observation.</li>
+        <li><strong>Groundedness:</strong> Anchored in specific, verifiable audio-visual evidence.</li>
+      </ul>
+      <div class="callout"><strong>Pure Needle failure:</strong> Using one modality to locate a moment and the other to simply report what happens — no reasoning involved. Fails the reasoning depth bar.</div>
+    </div>
+    <div class="block">
+      <h3>Key Ontology Tags</h3>
+      <div class="rule-grid">
+        <div class="rule-card"><strong>Inference</strong><p>Deducing unstated meaning from observable evidence.</p></div>
+        <div class="rule-card"><strong>Comparative</strong><p>Explicitly comparing two or more elements from the video.</p></div>
+        <div class="rule-card"><strong>Counting</strong><p>Counting instances — each must independently require both audio and visual reasoning.</p></div>
+        <div class="rule-card"><strong>Sequential</strong><p>Order of events. <em>Must always be paired with Temporal Understanding.</em></p></div>
+        <div class="rule-card"><strong>Referential Grounding</strong><p>Linking audio cue to simultaneous visual event. Concerns simultaneity.</p></div>
+        <div class="rule-card"><strong>Object Interaction Reasoning</strong><p>Requires visible change of state or physical transformation.</p></div>
+      </div>
+      <div class="callout" style="margin-top:14px"><strong>Hard Pairing Rule:</strong> Sequential must always be paired with Temporal Understanding. Missing this causes automatic rejection.</div>
+    </div>`
+  },
+  { section_id:"S06", order:6, type:"quiz", section_title:"Check-in #3", subtitle:"Four questions on the ontology." },
+  { section_id:"S07", order:7, type:"reading", section_title:"Answers, Timestamps & Safety", subtitle:"Rules for writing answers, timestamps, and safety compliance.",
+    body_html:`
+    <div class="block">
+      <h3>Valid Answers</h3>
+      <ul>
+        <li><strong>Human-authored:</strong> Written entirely in your own words.</li>
+        <li><strong>No first-person framing:</strong> Never use 'I think' or 'In my opinion'.</li>
+        <li><strong>Hedged inferences:</strong> Use 'appears', 'suggests', 'seems to' — not definitive statements.</li>
+      </ul>
+      <div class="callout"><strong>Stating internal states as facts is a hallucination.</strong> Use hedging language anchored to observable cues.</div>
+    </div>
+    <div class="block">
+      <h3>Timestamps</h3>
+      <div class="callout"><strong>Start:</strong> At the earliest point where any evidence required by the question first appears.</div>
+      <div class="callout"><strong>End:</strong> At the last point where evidence needed to verify the answer is present.</div>
+      <p>No padding. Timestamps must be as tight as possible.</p>
+    </div>
+    <div class="block">
+      <h3>Names, Brands & Safety</h3>
+      <ul>
+        <li>No real names, artist names, or character names — even if spoken in the video.</li>
+        <li>Use descriptors: 'the presenter', 'the man in the red shirt', 'the person on the left'.</li>
+        <li>No toxic, sexual, or weapon-centric content. When in doubt, skip or escalate.</li>
+      </ul>
+    </div>`
+  },
+  { section_id:"S08", order:8, type:"quiz", section_title:"Final Check-in", subtitle:"Last two questions — answers, timestamps, and safety." },
+];
+
+const DEMO_QUESTIONS = [
+  {section_id:"S02",question_id:"Q01",question_order:1,question_text:"According to the Omni Q&A instructions, which test is used to ensure a question has a genuine visual requirement?",options:[
+    {letter:"A",text:"The Mute Test",is_correct:false,explanation:"The Mute Test checks audio requirement — if you can answer with sound off, it fails. But that tests audio need, not visual."},
+    {letter:"B",text:"The Audio-Only Test",is_correct:true, explanation:"If a question can be answered by listening to the clip alone without seeing the visuals, it fails the requirement for dual modality."},
+    {letter:"C",text:"The Reasoning Depth Bar",is_correct:false,explanation:"This refers to the cognitive effort required — a separate quality bar from multimodal requirements."},
+    {letter:"D",text:"The Subtitles Check",is_correct:false,explanation:"Not a named test in the guidelines. Subtitles would be an audio cue made readable — not the visual modality test."},
+  ]},
+  {section_id:"S02",question_id:"Q02",question_order:2,question_text:"Which of the following correctly describes Core Principle #5 (Human-Authored Throughout)?",options:[
+    {letter:"A",text:"You may use AI to draft an answer, as long as you edit it significantly.",is_correct:false,explanation:"The guidelines are explicit: no language model assistance for drafting, rewriting, or editing — period."},
+    {letter:"B",text:"You may use model outputs only to confirm a stump, not to draft or edit content.",is_correct:true, explanation:"Model outputs are used only to confirm a stump. All writing must be original and human-authored."},
+    {letter:"C",text:"Human authorship applies only to questions — AI may assist with answers.",is_correct:false,explanation:"Both questions AND answers must be fully human-written."},
+    {letter:"D",text:"You must write questions yourself, but may use AI for phrasing edits.",is_correct:false,explanation:"Even phrasing edits must be human-authored. No exceptions are listed in the guidelines."},
+  ]},
+  {section_id:"S04",question_id:"Q03",question_order:1,question_text:"What is the purpose of 'Step 4: Stump Test Against the Model' in the workflow?",options:[
+    {letter:"A",text:"To identify if the question exposes a model weakness like hallucination or surface-level reasoning.",is_correct:true, explanation:"A successful 'stump' ensures the training data will help improve the model's complex multimodal understanding."},
+    {letter:"B",text:"To verify that the model can answer the question correctly before submission.",is_correct:false,explanation:"The goal is the opposite: to find questions where the model fails."},
+    {letter:"C",text:"To allow the model to rewrite the question in a more natural way.",is_correct:false,explanation:"Human-authored content is required; using model output for editing is strictly prohibited."},
+    {letter:"D",text:"To generate the initial draft of the answer for the human to edit.",is_correct:false,explanation:"All answers must be fully original and human-authored from scratch."},
+  ]},
+  {section_id:"S04",question_id:"Q04",question_order:2,question_text:"What is the primary characteristic of a 'Pure Needle' failure pattern?",options:[
+    {letter:"A",text:"Creating a question that is too long for the model to process.",is_correct:false,explanation:"Question length is a secondary concern compared to multimodal reasoning requirements."},
+    {letter:"B",text:"Including personal names of athletes or actors in the question.",is_correct:false,explanation:"This is a 'Names, Brands, and Safety' violation, not a reasoning depth failure."},
+    {letter:"C",text:"Using one modality to locate a moment and the other to report what happens with no reasoning.",is_correct:true, explanation:"The project requires cognitive effort beyond simple observation; merely 'pointing and naming' fails the reasoning depth bar."},
+    {letter:"D",text:"Asking a question that can be answered using only world knowledge.",is_correct:false,explanation:"While this is a failure, it is classified as lack of grounding rather than the specific 'needle' pattern."},
+  ]},
+  {section_id:"S04",question_id:"Q05",question_order:3,question_text:"When writing an answer for a question involving an inferred emotional state, which of the following is the correct approach?",options:[
+    {letter:"A",text:"Use 'I think' or 'In my opinion' to show it is a human-authored inference.",is_correct:false,explanation:"The instructions strictly prohibit first-person framing in all submitted answers."},
+    {letter:"B",text:"Use hedging language like 'appears' or 'suggests' supported by observable cues.",is_correct:true, explanation:"Professional, grounded answers must deduce meaning from visible/audible evidence while remaining objective."},
+    {letter:"C",text:"Skip the inference and only describe the physical actions taken by the subject.",is_correct:false,explanation:"Omitting the inference would fail to answer a question that specifically asks for reasoning or motives."},
+    {letter:"D",text:"State the internal state as a definitive fact to ensure the model learns correctly.",is_correct:false,explanation:"Stating internal states as facts is considered a hallucination."},
+  ]},
+  {section_id:"S06",question_id:"Q06",question_order:1,question_text:"Which ontology tagging rule is described as a 'hard pairing' that results in an automatic rejection if missed?",options:[
+    {letter:"A",text:"Sequential must be paired with Temporal Understanding.",is_correct:true, explanation:"Because sequential events involve reasoning about order over time, the broader temporal reasoning tag must always accompany it."},
+    {letter:"B",text:"Inference must be paired with General Holistic Reasoning.",is_correct:false,explanation:"Inference can be applied to specific segments and does not require the entire video's scope."},
+    {letter:"C",text:"Referential Grounding must be paired with Temporal Understanding.",is_correct:false,explanation:"Referential Grounding focuses on simultaneity and does not strictly require a temporal tag."},
+    {letter:"D",text:"Object Interaction Reasoning must be paired with Audio-Visual Stitching.",is_correct:false,explanation:"These tags represent different concepts: one concerns physical state changes, the other editorial transitions."},
+  ]},
+  {section_id:"S06",question_id:"Q07",question_order:2,question_text:"What is the primary difference between 'Referential Grounding' and 'Sequential' ontology tags?",options:[
+    {letter:"A",text:"Referential Grounding is visual-only, while Sequential is audio-only.",is_correct:false,explanation:"All valid questions must be multimodal; neither tag is limited to a single modality."},
+    {letter:"B",text:"Sequential is only used for counting, while Referential Grounding is for descriptions.",is_correct:false,explanation:"Counting is its own category; Sequential can involve any description as long as it involves temporal order."},
+    {letter:"C",text:"Referential Grounding concerns simultaneity, while Sequential concerns the order of events.",is_correct:true, explanation:"Referential Grounding asks what happens at the exact same moment as a cue, whereas Sequential requires before/after reasoning."},
+    {letter:"D",text:"Referential Grounding is a primary tag, while Sequential is always a secondary tag.",is_correct:false,explanation:"Either can be a primary tag depending on the core focus of the question."},
+  ]},
+  {section_id:"S06",question_id:"Q08",question_order:3,question_text:"Which of the following is a requirement for a 'Counting' question to be valid?",options:[
+    {letter:"A",text:"The question must provide the first instance as an example.",is_correct:false,explanation:"Questions should not hint at or provide parts of the answer; the model must find all instances through reasoning."},
+    {letter:"B",text:"Each counted instance must independently require both audio and visual reasoning to identify.",is_correct:true, explanation:"Counting identical, undifferentiated events is considered mechanical and does not test true multimodal reasoning."},
+    {letter:"C",text:"The total count must be greater than five to ensure complexity.",is_correct:false,explanation:"There is no minimum count requirement; validity depends on the reasoning per instance, not quantity."},
+    {letter:"D",text:"The counting must only involve speech-based audio cues.",is_correct:false,explanation:"Guidance encourages diverse audio cues, including environmental sounds and music."},
+  ]},
+  {section_id:"S06",question_id:"Q09",question_order:4,question_text:"For the 'Object Interaction Reasoning' tag to apply, which condition must be met?",options:[
+    {letter:"A",text:"The model must count the number of objects present in a scene.",is_correct:false,explanation:"Counting objects is a different ontology type and does not necessarily involve reasoning about interactions."},
+    {letter:"B",text:"A person must be performing a complex hand gesture or signal.",is_correct:false,explanation:"The guidelines specify that gestures and facial expressions do not count as object interactions."},
+    {letter:"C",text:"An object must undergo a visible change of state or physical transformation.",is_correct:true, explanation:"This tag specifically targets the effects of actions on trackable physical objects and their transformations."},
+    {letter:"D",text:"An object must be mentioned by name in the audio track.",is_correct:false,explanation:"Mere naming is an observational audio cue, not a reasoning requirement regarding the object's physical state."},
+  ]},
+  {section_id:"S08",question_id:"Q10",question_order:1,question_text:"When setting timestamps for a Q&A pair, where should the start timestamp be placed?",options:[
+    {letter:"A",text:"Exactly five seconds before the event in question.",is_correct:false,explanation:"Timestamps must be precise to the second based on the evidence, not a generic buffer period."},
+    {letter:"B",text:"Always at the very beginning of the video (0:00).",is_correct:false,explanation:"Timestamps should be as tight as possible; unnecessarily long spans decrease clarity and precision."},
+    {letter:"C",text:"At the exact second the person begins speaking the answer.",is_correct:false,explanation:"The start must encompass the evidence, which often appears before the verbal confirmation."},
+    {letter:"D",text:"At the earliest point where any evidence required by the question first appears.",is_correct:true, explanation:"Reviewers must be able to see and hear all cues and actions needed to verify the answer within the declared window."},
+  ]},
+  {section_id:"S08",question_id:"Q11",question_order:2,question_text:"Which of these is strictly PROHIBITED when identifying people or characters in a Q&A pair?",options:[
+    {letter:"A",text:"Using their real or fictional names (e.g., 'Marcus' or 'Batman').",is_correct:true, explanation:"Safety and privacy rules prohibit all personal, artist, and character names, even if spoken in the video."},
+    {letter:"B",text:"Referencing their physical position (e.g., 'the person on the left').",is_correct:false,explanation:"Spatial positioning is a valid and useful way to anchor a question to specific visual evidence."},
+    {letter:"C",text:"Describing their clothing (e.g., 'the man in the red shirt').",is_correct:false,explanation:"Visual descriptors are encouraged to uniquely identify subjects without using restricted information."},
+    {letter:"D",text:"Using gender-neutral descriptors (e.g., 'the presenter').",is_correct:false,explanation:"Professional descriptors like 'presenter' or 'player' are the standard way to refer to individuals in the project."},
+  ]},
+];
+
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+let state = {
+  user: { name: '', email: '' },
+  currentIdx: 0,
+  answers: {},
+  done: new Set(),
+  sections: [],
+  questions: [],
+};
+
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Load saved config from localStorage (set by admin panel)
+  const savedSheet  = localStorage.getItem('inv-sheet-id');
+  const savedScript = localStorage.getItem('inv-script-url');
+  if (savedSheet)  SHEET_ID        = savedSheet;
+  if (savedScript) APPS_SCRIPT_URL = savedScript;
+
+  // Restore saved theme
+  const savedTheme = localStorage.getItem('inv-theme');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-toggle').textContent = '☾';
+  }
+
+  // Open admin panel if ?admin in URL (share link only with DQA/management)
+  if (location.search.includes('admin')) openAdmin();
+
+  // Keyboard shortcut: Ctrl+Shift+A
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'A') openAdmin();
+  });
+
+  setTimeout(() => {
+    document.getElementById('loading-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('ready');
+  }, 900);
+});
+
+// ════════════════════════════════════════════════════════
+//  THEME TOGGLE
+// ════════════════════════════════════════════════════════
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  const btn = document.getElementById('theme-toggle');
+  btn.textContent = isLight ? '☾' : '☀';
+  localStorage.setItem('inv-theme', isLight ? 'light' : 'dark');
+}
+
+// ════════════════════════════════════════════════════════
+//  ADMIN PANEL
+// ════════════════════════════════════════════════════════
+function openAdmin() {
+  const modal = document.getElementById('admin-modal');
+  modal.classList.add('open');
+  // Pre-fill with current values
+  document.getElementById('cfg-sheet-id').value   = SHEET_ID || localStorage.getItem('inv-sheet-id') || '';
+  document.getElementById('cfg-script-url').value = APPS_SCRIPT_URL || localStorage.getItem('inv-script-url') || '';
+  document.getElementById('admin-status').className = 'admin-status';
+}
+
+function closeAdmin() {
+  document.getElementById('admin-modal').classList.remove('open');
+  // Remove ?admin from URL without reloading
+  if (location.search.includes('admin')) {
+    history.replaceState(null, '', location.pathname);
+  }
+}
+
+function saveAdminConfig() {
+  const sheetId   = document.getElementById('cfg-sheet-id').value.trim();
+  const scriptUrl = document.getElementById('cfg-script-url').value.trim();
+  const status    = document.getElementById('admin-status');
+
+  if (!sheetId) {
+    status.textContent = '✕ Sheet ID is required.';
+    status.className = 'admin-status err';
+    return;
+  }
+
+  localStorage.setItem('inv-sheet-id',    sheetId);
+  localStorage.setItem('inv-script-url',  scriptUrl);
+  SHEET_ID        = sheetId;
+  APPS_SCRIPT_URL = scriptUrl;
+
+  status.textContent = '✓ Saved. New settings will apply on the next session start.';
+  status.className = 'admin-status ok';
+
+  setTimeout(closeAdmin, 1800);
+}
+
+// Close modal on backdrop click
+document.getElementById('admin-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAdmin();
+});
+
+function toggleConfig() {} // kept as no-op for safety
+
+// ════════════════════════════════════════════════════════
+//  SESSION START — load sheet or use demo
+// ════════════════════════════════════════════════════════
+async function startSession() {
+  const name  = document.getElementById('input-name').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  if (!name || !email) { alert('Please enter your name and email.'); return; }
+  state.user = { name, email };
+
+  const sheetId = SHEET_ID;
+
+  setLoading(true, 'Loading training content…');
+
+  if (sheetId) {
+    try {
+      await loadFromSheet(sheetId);
+    } catch(e) {
+      console.warn('Sheet load failed, falling back to demo:', e);
+      state.sections  = DEMO_SECTIONS;
+      state.questions = DEMO_QUESTIONS;
+    }
+  } else {
+    state.sections  = DEMO_SECTIONS;
+    state.questions = DEMO_QUESTIONS;
+  }
+
+  setLoading(false);
+  document.getElementById('topbar-user-name').textContent = name;
+  showScreen('content');
+  buildSidebar();
+  renderSection(0);
+  updateProgress();
+}
+
+function setLoading(on, msg = '') {
+  const ls = document.getElementById('loading-screen');
+  const status = document.getElementById('loading-status');
+  if (on) {
+    ls.classList.remove('hidden');
+    if (msg) status.textContent = msg;
+    document.getElementById('app').style.display = 'none';
+  } else {
+    ls.classList.add('hidden');
+    document.getElementById('app').style.display = 'block';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  GOOGLE SHEETS LOADER
+//  Reads two published CSV tabs: SECTIONS and QUESTIONS
+// ════════════════════════════════════════════════════════
+async function loadFromSheet(sheetId) {
+  const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=`;
+
+  const [secText, qText] = await Promise.all([
+    fetch(base + 'SECTIONS').then(r => r.text()),
+    fetch(base + 'QUESTIONS').then(r => r.text()),
+  ]);
+
+  state.sections  = parseCSV(secText,  ['section_id','order','type','section_title','subtitle','body_html']);
+  state.sections.sort((a,b) => +a.order - +b.order);
+
+  const rawQ = parseCSV(qText, ['section_id','question_id','question_order','question_text','option_letter','option_text','is_correct','explanation','topic_tag']);
+
+  // Group options into question objects
+  const qMap = {};
+  for (const row of rawQ) {
+    const key = `${row.section_id}__${row.question_id}`;
+    if (!qMap[key]) {
+      qMap[key] = {
+        section_id: row.section_id,
+        question_id: row.question_id,
+        question_order: +row.question_order,
+        question_text: row.question_text,
+        options: []
+      };
+    }
+    qMap[key].options.push({
+      letter: row.option_letter,
+      text: row.option_text,
+      is_correct: row.is_correct === 'TRUE' || row.is_correct === 'true',
+      explanation: row.explanation
+    });
+  }
+  state.questions = Object.values(qMap);
+}
+
+function parseCSV(text, headers) {
+  const lines = text.trim().split('\n').slice(1); // skip header row
+  return lines.map(line => {
+    const vals = splitCSVLine(line);
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').trim().replace(/^"|"$/g, ''));
+    return obj;
+  }).filter(r => r[headers[0]]);
+}
+
+function splitCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur); cur = ''; }
+    else cur += line[i];
+  }
+  result.push(cur);
+  return result;
+}
+
+// ════════════════════════════════════════════════════════
+//  SCREENS
+// ════════════════════════════════════════════════════════
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const map = { login:'screen-login', content:'screen-content', score:'screen-score' };
+  const el = document.getElementById(map[name]);
+  el.style.display = 'flex';
+  el.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════
+//  SIDEBAR
+// ════════════════════════════════════════════════════════
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = `<div class="sidebar-group"><div class="sidebar-label">Training Sections</div>` +
+    state.sections.map((s, i) => {
+      const isQuiz = s.type === 'quiz';
+      return `<div class="nav-item ${isQuiz ? 'quiz-item' : ''}" id="nav-${i}" onclick="goTo(${i})">
+        <span class="nav-icon">${isQuiz ? '◆' : String(i+1).padStart(2,'0')}</span>
+        <span class="nav-label">${s.section_title}</span>
+        <span class="nav-check" id="nchk-${i}"></span>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+function updateSidebarActive(idx) {
+  document.querySelectorAll('.nav-item').forEach((el,i) => el.classList.toggle('active', i===idx));
+}
+
+// ════════════════════════════════════════════════════════
+//  PROGRESS
+// ════════════════════════════════════════════════════════
+function updateProgress() {
+  const total = state.sections.length;
+  const done  = state.done.size;
+  const pct   = total ? Math.round(done/total*100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${done} / ${total}`;
+}
+
+// ════════════════════════════════════════════════════════
+//  RENDER SECTION
+// ════════════════════════════════════════════════════════
+function renderSection(idx) {
+  state.currentIdx = idx;
+  const s = state.sections[idx];
+  if (!s) return;
+  updateSidebarActive(idx);
+  window.scrollTo(0, 0);
+
+  const main = document.getElementById('main');
+
+  if (s.type === 'reading') {
+    main.innerHTML = `<div class="fade-up">
+      <div class="eyebrow">${s.section_id || ('Part ' + idx)}</div>
+      <h1 class="section-h1">${s.section_title}</h1>
+      <p class="section-lead">${s.subtitle}</p>
+      ${s.body_html || ''}
+      <div class="section-nav">
+        ${idx > 0 ? `<button class="btn-ghost" onclick="goTo(${idx-1})">← Back</button>` : '<div></div>'}
+        <button class="btn-primary" onclick="completeReading(${idx})">Continue <span class="arrow">→</span></button>
+      </div>
+    </div>`;
+  } else {
+    renderQuiz(idx, s);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  QUIZ RENDER
+// ════════════════════════════════════════════════════════
+function renderQuiz(idx, s) {
+  const qs = state.questions
+    .filter(q => q.section_id === s.section_id)
+    .sort((a,b) => a.question_order - b.question_order);
+
+  const qHtml = qs.map((q, qi) => buildQHtml(q, qi, qs.length)).join('');
+  const isLast = idx === state.sections.length - 1;
+
+  document.getElementById('main').innerHTML = `<div class="fade-up">
+    <div class="eyebrow">${s.section_id || 'Check-in'}</div>
+    <h1 class="section-h1">${s.section_title}</h1>
+    <p class="section-lead">${s.subtitle}</p>
+    <div class="quiz-header">
+      <div class="quiz-icon">◆</div>
+      <div>
+        <h3>${qs.length} Question${qs.length !== 1 ? 's' : ''}</h3>
+        <p>Select an answer — you'll get instant feedback with an explanation from the guidelines.</p>
+      </div>
+    </div>
+    ${qHtml}
+    <div class="section-nav" id="quiz-nav-${idx}" style="display:none">
+      ${idx > 0 ? `<button class="btn-ghost" onclick="goTo(${idx-1})">← Back</button>` : '<div></div>'}
+      ${!isLast
+        ? `<button class="btn-primary" onclick="completeQuiz(${idx})">Continue <span class="arrow">→</span></button>`
+        : `<button class="btn-primary" onclick="finishTraining()">Complete Training <span class="arrow">✓</span></button>`}
+    </div>
+  </div>`;
+
+  // Restore prior answers
+  qs.forEach(q => {
+    if (state.answers[q.question_id] !== undefined) {
+      applyAnswer(q.question_id, state.answers[q.question_id].selected, q, false);
+    }
+  });
+  checkQuizNav(idx, qs);
+}
+
+function buildQHtml(q, qi, total) {
+  const opts = q.options.map(o => `
+    <div class="option" id="opt-${q.question_id}-${o.letter}" onclick="selectAnswer('${q.question_id}','${o.letter}')">
+      <div class="opt-letter">${o.letter}</div>
+      <div class="opt-body">
+        <div class="opt-text">${o.text}</div>
+        <div class="opt-verdict">${o.is_correct ? '✓ Correct' : '✗ Not quite'}</div>
+        <div class="opt-explain">${o.explanation}</div>
+      </div>
+    </div>`).join('');
+
+  return `<div class="q-card" id="qcard-${q.question_id}">
+    <div class="q-meta">Question ${qi+1} of ${total}</div>
+    <div class="q-text">${q.question_text}</div>
+    <div class="options" id="opts-${q.question_id}">${opts}</div>
+    <div class="q-feedback" id="qfb-${q.question_id}"></div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  ANSWER HANDLING
+// ════════════════════════════════════════════════════════
+function selectAnswer(qId, letter) {
+  if (state.answers[qId] !== undefined) return;
+  const q = state.questions.find(x => x.question_id === qId);
+  if (!q) return;
+  applyAnswer(qId, letter, q, true);
+  checkQuizNav(state.currentIdx, state.questions.filter(x => x.section_id === state.sections[state.currentIdx].section_id));
+}
+
+function applyAnswer(qId, letter, q, save) {
+  const correct = q.options.find(o => o.is_correct);
+  const isRight = letter === correct.letter;
+  if (save) state.answers[qId] = { selected: letter, correct: isRight };
+
+  document.querySelectorAll(`#opts-${qId} .option`).forEach(el => el.classList.add('disabled'));
+  const selEl = document.getElementById(`opt-${qId}-${letter}`);
+  if (selEl) selEl.classList.add(isRight ? 'correct' : 'wrong');
+  if (!isRight) {
+    const corrEl = document.getElementById(`opt-${qId}-${correct.letter}`);
+    if (corrEl) corrEl.classList.add('correct');
+  }
+  const fb = document.getElementById(`qfb-${qId}`);
+  if (fb) {
+    fb.className = `q-feedback show ${isRight ? 'pass' : 'fail'}`;
+    fb.textContent = isRight
+      ? `✓ ${correct.explanation}`
+      : `The correct answer is ${correct.letter}. ${correct.explanation}`;
+  }
+}
+
+function checkQuizNav(sIdx, qs) {
+  const allDone = qs.every(q => state.answers[q.question_id] !== undefined);
+  const nav = document.getElementById(`quiz-nav-${sIdx}`);
+  if (nav && allDone) nav.style.display = 'flex';
+}
+
+// ════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════
+function goTo(idx) { renderSection(idx); }
+
+function completeReading(idx) {
+  markDone(idx);
+  renderSection(idx + 1);
+}
+
+function completeQuiz(idx) {
+  markDone(idx);
+  renderSection(idx + 1);
+}
+
+function markDone(idx) {
+  state.done.add(idx);
+  const chk = document.getElementById(`nchk-${idx}`);
+  if (chk) chk.textContent = '✓';
+  document.getElementById(`nav-${idx}`)?.classList.remove('active');
+  updateProgress();
+}
+
+// ════════════════════════════════════════════════════════
+//  FINISH
+// ════════════════════════════════════════════════════════
+function finishTraining() {
+  markDone(state.currentIdx);
+
+  let correct = 0, total = 0;
+  for (const q of state.questions) {
+    total++;
+    if (state.answers[q.question_id]?.correct) correct++;
+  }
+  const pct = total ? Math.round(correct/total*100) : 0;
+
+  const numEl = document.getElementById('score-num');
+  numEl.textContent = pct + '%';
+  numEl.className = 'score-number ' + (pct >= 80 ? 'great' : pct >= 60 ? 'ok' : 'low');
+
+  document.getElementById('stat-correct').textContent = `${correct}/${total}`;
+  document.getElementById('stat-pct').textContent = pct + '%';
+
+  const first = state.user.name.split(' ')[0];
+  if (pct >= 80) {
+    document.getElementById('score-title').textContent = `Well done, ${first}.`;
+    document.getElementById('score-msg').textContent = `You answered ${correct} of ${total} correctly. You're cleared for the official assessment.`;
+  } else if (pct >= 60) {
+    document.getElementById('score-title').textContent = `Good effort, ${first}.`;
+    document.getElementById('score-msg').textContent = `You got ${correct} of ${total} correct. Review the sections where you missed before taking the official quiz.`;
+  } else {
+    document.getElementById('score-title').textContent = `Keep studying, ${first}.`;
+    document.getElementById('score-msg').textContent = `You got ${correct} of ${total} correct. Please retake the training and review the guidelines carefully.`;
+  }
+
+  // Log to Apps Script if configured
+  if (APPS_SCRIPT_URL) logCompletion(pct, correct, total);
+
+  showScreen('score');
+}
+
+async function logCompletion(pct, correct, total) {
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        name: state.user.name,
+        email: state.user.email,
+        score_correct: correct,
+        score_total: total,
+        score_pct: pct + '%',
+        status: pct >= 70 ? 'PASSED' : 'REVIEW'
+      })
+    });
+  } catch(e) { console.warn('Completion log failed:', e); }
+}
+
+function restartApp() {
+  state.answers = {}; state.done = new Set(); state.currentIdx = 0;
+  buildSidebar();
+  showScreen('content');
+  renderSection(0);
+  updateProgress();
+}
+</script>
+</body>
+</html>
