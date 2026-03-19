@@ -183,13 +183,15 @@ body.light .topbar-logo svg path { fill: var(--accent); }
   border: 1px solid var(--border);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
   transition: all .2s;
-  box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  box-shadow: 0 2px 12px rgba(0,0,0,.3);
+  color: #B8F04A;   /* always lime — visible on both dark and light */
 }
 .theme-toggle:hover {
-  border-color: var(--accent);
-  transform: scale(1.08);
+  border-color: #B8F04A;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(184,240,74,.2);
 }
 
 
@@ -507,7 +509,8 @@ body.light .topbar-logo svg path { fill: var(--accent); }
 /* ─── MAIN CONTENT ─────────────────────────────────────── */
 .main {
   padding: 48px 56px;
-  max-width: 760px;
+  width: 100%;
+  min-width: 0;
 }
 
 /* Section header */
@@ -862,7 +865,7 @@ body.light .topbar-logo svg path { fill: var(--accent); }
 
 // ★ REPLACE WITH YOUR SHEET ID to pull live data
 // Format: https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet=SECTIONS
-let SHEET_ID = "19ApRDCTxT-McevNXRoHdHXME-tGw_R5Z-uhf0xX8pmA";   // e.g. "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+let SHEET_ID = "19ApRDCTxT-McevNXRoHdHXME-tGw_R5Z-uhf0xX8pmA";
 
 // ★ REPLACE WITH YOUR APPS SCRIPT WEB APP URL for completion logging
 let APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysG5SrYGX_EipqjauQuhWeIavxCGueHh8sUmk1qmX6685zNrYfe8LUlSbk0DA5BKRv_w/exec";   // e.g. "https://script.google.com/macros/s/AKfyc.../exec"
